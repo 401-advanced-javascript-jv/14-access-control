@@ -26,7 +26,7 @@ app.use(authRouter);
 app.use(routes);
 
 // Role population available only when in dev mode
-if (!!process.env.DEVMODE) {
+if (process.env.DEVMODE) {
   app.use(require('./auth/populate-roles.route.js'));
 }
 
