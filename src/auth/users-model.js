@@ -29,16 +29,16 @@ users.virtual('capabilities', {
 });
 
 users.pre('find', function(next) {
-  this.populate('capabilities', 'capabilities');
+  this.populate('capabilities');
+  next();
 });
 
 users.pre('findOne', function(next) {
-  this.populate('capabilities', 'capabilities');
+  this.populate('capabilities');
   next();
 });
 
 users.pre('save', function(next) {
-  this.populate('capabilities');
   bcrypt
     .hash(this.password, 10)
     .then((hashedPassword) => {

@@ -8,7 +8,7 @@ router.get('/public-stuff', (request, response, _) => {
 });
 
 router.get('/hidden-stuff', auth(), (request, response, _) => {
-  response.status(200).send('hidden stuff requires some kind of authentication');
+  response.status(200).send('hidden stuff requires any kind of authentication');
 });
 
 router.get('/something-to-read', auth('read'), (request, response, _) => {
