@@ -16,7 +16,7 @@ const users = new mongoose.Schema(
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     email: { type: String },
-    role: { type: String, default: 'user', enum: ['admin', 'editor', 'user'] },
+    role: { type: String, default: 'user', enum: ['admin', 'editor', 'user', 'superuser'] },
   },
   { toObject: { virtuals: true }, toJSON: { virtuals: true } }
 );
@@ -28,12 +28,17 @@ users.virtual('capabilities', {
   justOne: true,
 });
 
+users.pre('find', function(next) {
+  this.populate('capabilities', 'capabilities');
+});
+
 users.pre('findOne', function(next) {
-  this.populate('capabilities');
+  this.populate('capabilities', 'capabilities');
   next();
 });
 
 users.pre('save', function(next) {
+  this.populate('capabilities');
   bcrypt
     .hash(this.password, 10)
     .then((hashedPassword) => {

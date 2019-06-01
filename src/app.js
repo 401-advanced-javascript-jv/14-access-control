@@ -23,6 +23,11 @@ app.use(express.urlencoded({extended:true}));
 // Routes
 app.use(authRouter);
 
+// Role population available only when in dev mode
+if (!!process.env.DEVMODE) {
+  app.use(require('./auth/populate-roles.route.js'));
+}
+
 // Catchalls
 app.use(notFound);
 app.use(errorHandler);
