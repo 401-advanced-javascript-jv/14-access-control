@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 
 const server = require('../../../src/app.js').server;
 const supergoose = require('../../supergoose.js');
-const User = require('../../../src/auth/users-model.js');
 const Role = require('../../../src/auth/roles-model.js');
 
 const mockRequest = supergoose.server(server);
@@ -40,13 +39,13 @@ let encodedBasic = {
   admin: 'YWRtaW46cGFzc3dvcmQ=',
   editor: 'ZWRpdG9yOnBhc3N3b3Jk',
   user: 'dXNlcjpwYXNzd29yZA==',
-  super: 'c3VwZXI6dXNlcg==',
+  superuser: 'c3VwZXI6dXNlcg==',
 };
 
 beforeAll(async (done) => {
   await supergoose.startDB();
 
-  for(let roleType of Object.keys(roles)) {
+  for (let roleType of Object.keys(roles)) {
     await new Role(roles[roleType]).save();
   }
 
@@ -56,19 +55,18 @@ beforeAll(async (done) => {
 afterAll(supergoose.stopDB);
 
 describe('Auth Router', () => {
-
-  Object.keys(users).forEach( userType => {
-
+  Object.keys(users).forEach((userType) => {
     describe(`${userType} users`, () => {
-
       let encodedToken;
       let id;
+      let encodedKey;
 
       it('can create one', () => {
-        return mockRequest.post('/signup')
+        return mockRequest
+          .post('/signup')
           .send(users[userType])
-          .then(results => {
-            var token = jwt.verify(results.text, process.env.SECRET);
+          .then((results) => {
+            let token = jwt.verify(results.text, process.env.SECRET);
             id = token.id;
             encodedToken = results.text;
             expect(token.id).toBeDefined();
@@ -76,28 +74,62 @@ describe('Auth Router', () => {
           });
       });
 
-      it('can signin with basic', () => {
-        return mockRequest.post('/signin')
+      it('can create an auth key', () => {
+        return mockRequest
+          .post('/key')
           .auth(users[userType].username, users[userType].password)
-          .then(results => {
-            var token = jwt.verify(results.text, process.env.SECRET);
+          .then((results) => {
+            let key = jwt.verify(results.text, process.env.SECRET);
+            encodedKey = results.text;
+            expect(key.id).toEqual(id);
+            expect(key.type).toEqual('key');
+            expect(key.capabilities).toBeDefined();
+          });
+      });
+
+      it('can signin with basic', () => {
+        return mockRequest
+          .post('/signin')
+          .auth(users[userType].username, users[userType].password)
+          .then((results) => {
+            let token = jwt.verify(results.text, process.env.SECRET);
             expect(token.id).toEqual(id);
             expect(token.capabilities).toBeDefined();
           });
       });
 
       it('can signin with bearer', () => {
-        return mockRequest.post('/signin')
+        return mockRequest
+          .post('/signin')
           .set('Authorization', `Bearer ${encodedToken}`)
-          .then(results => {
-            var token = jwt.verify(results.text, process.env.SECRET);
+          .then((results) => {
+            let token = jwt.verify(results.text, process.env.SECRET);
             expect(token.id).toEqual(id);
             expect(token.capabilities).toBeDefined();
+            token.capabilities.forEach((capability) => {
+              expect(
+                roles[userType].capabilities.includes(capability)
+              ).toBeTruthy();
+            });
           });
       });
 
+      it('can sign in with a key', () => {
+        return mockRequest
+          .post('/key')
+          .set('Authorization', `Bearer ${encodedKey}`)
+          .then((results) => {
+            let key = jwt.verify(results.text, process.env.SECRET);
+            expect(key.id).toEqual(id);
+            expect(key.type).toEqual('key');
+            expect(key.capabilities).toBeDefined();
+            key.capabilities.forEach((capability) => {
+              expect(
+                roles[userType].capabilities.includes(capability)
+              ).toBeTruthy();
+            });
+          });
+      });
     });
-
   });
-
 });

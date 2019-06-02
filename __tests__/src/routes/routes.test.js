@@ -8,6 +8,7 @@ const server = require('../../../src/app.js').server;
 const supergoose = require('../../supergoose.js');
 const User = require('../../../src/auth/users-model.js');
 const Role = require('../../../src/auth/roles-model.js');
+const auth = require('../../../src/auth/middleware.js');
 
 const mockRequest = supergoose.server(server);
 
@@ -40,7 +41,7 @@ let encodedBasic = {
   admin: 'YWRtaW46cGFzc3dvcmQ=',
   editor: 'ZWRpdG9yOnBhc3N3b3Jk',
   user: 'dXNlcjpwYXNzd29yZA==',
-  super: 'c3VwZXI6dXNlcg==',
+  superuser: 'c3VwZXI6dXNlcg==',
 };
 
 beforeAll(async (done) => {
@@ -58,6 +59,25 @@ beforeAll(async (done) => {
 });
 
 afterAll(supergoose.stopDB);
-describe('empty test', () => {
-  it('passes', () => {});
+describe('Routes', () => {
+
+  let cachedToken;
+  let cachedKey;
+
+  return mockRequest.post('/signin').auth(users.superuser.username, users.superuser.password)
+    .then(superUser => {
+      cachedToken.superuser = superUser.token;
+    });
+
+  it('/key route returns an auth key', () => {
+
+    // return mockReqest.post('/key')
+
+  });
+
+  it('Unprotected routes are open to all users', () => {
+
+
+
+  });
 });

@@ -6,7 +6,7 @@
     "start": "node index.js",
     "watch": "nodemon index.js",
     "test-watch": "jest --watchAll",
-    "test": "jest",
+    "test": "jest --coverage",
     "lint": "eslint '**/*.js'",
     "lintfix": "eslint --fix '**/*.js'"
   },

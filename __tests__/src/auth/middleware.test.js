@@ -36,7 +36,7 @@ let encodedBasic = {
   admin: 'YWRtaW46cGFzc3dvcmQ=',
   editor: 'ZWRpdG9yOnBhc3N3b3Jk',
   user: 'dXNlcjpwYXNzd29yZA==',
-  super: 'c3VwZXI6dXNlcg==',
+  superuser: 'c3VwZXI6dXNlcg==',
 };
 
 beforeAll(async (done) => {
@@ -134,16 +134,9 @@ describe('Auth Middleware', () => {
   });
 
   describe('user authorization', () => {
-    let cachedTokens = {};
 
-      let userSigninMiddleware = auth();
-      for ( let key of Object.keys( encodedBasic ) ) {
-        let request = { headers: { authorization: `Basic ${encodedBasic[key]}` } };
-        let response = {};
-        let next = jest.fn();
-        Promise.resolve(userSigninMiddleware( request, response, next ))
-          .then(() => cachedTokens[key] = request.token);
-      }
+    let cachedTokens = {};
+    let userSigninMiddleware = auth();
 
     it('restricts access to a valid user without permissions', () => {
       let request = {
@@ -158,6 +151,40 @@ describe('Auth Middleware', () => {
       });
     }); // it()
 
-    it('grants access when a user has permission', () => {}); // it()
+    it('grants access when a user has permission', () => {
+
+      let request = { headers: { authorization: `Basic ${encodedBasic.superuser}` } };
+      let response = {};
+      let next = jest.fn();
+      return userSigninMiddleware( request, response, next )
+        .then( () => cachedTokens.superuser = request.token );
+
+    });
+
+    describe('grants access when a user has permission', () => {
+
+      roles.superuser.capabilities.forEach(capability => {
+        it(`auth('${capability}') with superuser Bearer auth`, async () => {
+
+          for ( let userType of Object.keys( encodedBasic ) ) {
+          }
+
+          let request = {
+            headers: {authorization: `Bearer ${cachedTokens.superuser}`},
+          };
+          let response = {};
+          let next = jest.fn();
+          let middleware = auth(capability);
+
+          return Promise.resolve(middleware(request, response, next))
+            .then(() => {
+            expect(next).toHaveBeenCalledWith();
+          });
+
+        });
+      });
+
+    }); // it()
+
   }); // describe()
 });
