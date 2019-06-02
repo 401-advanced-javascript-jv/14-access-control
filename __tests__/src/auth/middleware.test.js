@@ -4,8 +4,8 @@ process.env.SECRET = 'test';
 
 const { startDB, stopDB } = require('../../supergoose.js');
 const auth = require('../../../src/auth/middleware.js');
-const Users = require('../../../src/auth/users-model.js');
-const Roles = require('../../../src/auth/roles-model.js');
+const User = require('../../../src/auth/users-model.js');
+const Role = require('../../../src/auth/roles-model.js');
 
 // admin:password: YWRtaW46cGFzc3dvcmQ=
 // admin:foo: YWRtaW46Zm9v
@@ -42,11 +42,11 @@ let encodedBasic = {
 beforeAll(async (done) => {
   await startDB();
 
-  for (let key of Object.keys(users)) {
-    await new Users(users[key]).save();
+  for (let userType of Object.keys(users)) {
+    await new User(users[userType]).save();
   }
-  for (let key of Object.keys(roles)) {
-    await new Roles(roles[key]).save();
+  for (let roleType of Object.keys(roles)) {
+    await new Role(roles[roleType]).save();
   }
 
   done();
