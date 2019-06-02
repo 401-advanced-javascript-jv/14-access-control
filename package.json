@@ -1,25 +1,37 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
     "watch": "nodemon index.js",
     "test-watch": "jest --watchAll",
-    "test": "jest"
+    "test": "jest --coverage",
+    "lint": "eslint '**/*.js'",
+    "lintfix": "eslint --fix '**/*.js'"
   },
   "jest": {
     "testEnvironment": "node"
   },
+  "devDependencies": {
+    "@types/jest": "^24.0.13",
+    "prettier": "^1.17.1"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "trailingComma": "es5",
+    "arrowParens": "always",
+    "endOfLine": "lf"
+  },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Jesse Van Volkinburg <vanvoljg@gmail.com>",
+  "license": "MIT",
   "dependencies": {
     "bcrypt": "^3.0.2",
     "cors": "^2.8.4",
     "debug": "^4.1.0",
     "dotenv": "^6.1.0",
+    "eslint": "^5.16.0",
     "express": "^4.16.3",
     "jest": "^23.6.0",
     "jsonwebtoken": "^8.4.0",
@@ -30,5 +42,14 @@
     "require-directory": "^2.1.1",
     "supertest": "^3.3.0",
     "swagger-ui-express": "^4.0.2"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/401-advanced-javascript-jv/14-access-control.git"
+  },
+  "bugs": {
+    "url": "https://github.com/401-advanced-javascript-jv/14-access-control/issues"
+  },
+  "homepage": "https://github.com/401-advanced-javascript-jv/14-access-control#readme",
+  "description": ""
 }
