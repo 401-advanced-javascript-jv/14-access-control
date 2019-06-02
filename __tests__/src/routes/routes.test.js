@@ -64,20 +64,16 @@ describe('Routes', () => {
   let cachedToken;
   let cachedKey;
 
-  return mockRequest.post('/signin').auth(users.superuser.username, users.superuser.password)
-    .then(superUser => {
-      cachedToken.superuser = superUser.token;
-    });
-
-  it('/key route returns an auth key', () => {
-
-    // return mockReqest.post('/key')
-
-  });
+  (async () => {
+    await mockRequest.post( '/signin' ).auth( users.superuser.username, users.superuser.password )
+      .then( superUser => {
+        cachedToken.superuser = superUser.token;
+      } );
+  })();
 
   it('Unprotected routes are open to all users', () => {
 
-
+    expect(true).toBeTruthy();
 
   });
 });

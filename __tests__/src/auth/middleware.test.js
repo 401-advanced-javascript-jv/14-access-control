@@ -134,7 +134,6 @@ describe('Auth Middleware', () => {
   });
 
   describe('user authorization', () => {
-
     let cachedTokens = {};
     let userSigninMiddleware = auth();
 
@@ -152,39 +151,35 @@ describe('Auth Middleware', () => {
     }); // it()
 
     it('grants access when a user has permission', () => {
-
-      let request = { headers: { authorization: `Basic ${encodedBasic.superuser}` } };
+      let request = {
+        headers: { authorization: `Basic ${encodedBasic.superuser}` },
+      };
       let response = {};
       let next = jest.fn();
-      return userSigninMiddleware( request, response, next )
-        .then( () => cachedTokens.superuser = request.token );
-
+      return userSigninMiddleware(request, response, next).then(() => {
+        cachedTokens.superuser = request.token;
+        expect(true).toBeTruthy();
+      });
     });
 
     describe('grants access when a user has permission', () => {
-
-      roles.superuser.capabilities.forEach(capability => {
+      roles.superuser.capabilities.forEach((capability) => {
         it(`auth('${capability}') with superuser Bearer auth`, async () => {
 
-          for ( let userType of Object.keys( encodedBasic ) ) {
-          }
-
           let request = {
-            headers: {authorization: `Bearer ${cachedTokens.superuser}`},
+            headers: { authorization: `Bearer ${cachedTokens.superuser}` },
           };
           let response = {};
           let next = jest.fn();
           let middleware = auth(capability);
 
-          return Promise.resolve(middleware(request, response, next))
-            .then(() => {
-            expect(next).toHaveBeenCalledWith();
-          });
-
+          return Promise.resolve(middleware(request, response, next)).then(
+            () => {
+              expect(next).toHaveBeenCalledWith();
+            }
+          );
         });
       });
-
     }); // it()
-
   }); // describe()
 });
